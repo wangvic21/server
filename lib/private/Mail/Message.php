@@ -34,7 +34,6 @@ namespace OC\Mail;
 use OCP\Mail\IAttachment;
 use OCP\Mail\IEMailTemplate;
 use OCP\Mail\IMessage;
-use Swift_Message;
 
 /**
  * Class Message provides a wrapper around SwiftMail
@@ -42,12 +41,12 @@ use Swift_Message;
  * @package OC\Mail
  */
 class Message implements IMessage {
-	/** @var Swift_Message */
+	/** @var \Symfony\Component\Mime\Email */
 	private $swiftMessage;
 	/** @var bool */
 	private $plainTextOnly;
 
-	public function __construct(Swift_Message $swiftMessage, bool $plainTextOnly) {
+	public function __construct(\Symfony\Component\Mime\Email $swiftMessage, bool $plainTextOnly) {
 		$this->swiftMessage = $swiftMessage;
 		$this->plainTextOnly = $plainTextOnly;
 	}
@@ -259,17 +258,17 @@ class Message implements IMessage {
 
 	/**
 	 * Get's the underlying SwiftMessage
-	 * @param Swift_Message $swiftMessage
+	 * @param \Symfony\Component\Mime\Email $swiftMessage
 	 */
-	public function setSwiftMessage(Swift_Message $swiftMessage): void {
+	public function setSwiftMessage(\Symfony\Component\Mime\Email $swiftMessage): void {
 		$this->swiftMessage = $swiftMessage;
 	}
 
 	/**
 	 * Get's the underlying SwiftMessage
-	 * @return Swift_Message
+	 * @return \Symfony\Component\Mime\Email
 	 */
-	public function getSwiftMessage(): Swift_Message {
+	public function getSwiftMessage(): \Symfony\Component\Mime\Email {
 		return $this->swiftMessage;
 	}
 

@@ -69,7 +69,7 @@ use OCP\Mail\IMessage;
  * @package OC\Mail
  */
 class Mailer implements IMailer {
-	/** @var \Swift_Mailer Cached mailer */
+	/** @var \Symfony\Component\Mailer\MailerInterface Cached mailer */
 	private $instance = null;
 	/** @var IConfig */
 	private $config;
@@ -117,7 +117,7 @@ class Mailer implements IMailer {
 	 */
 	public function createMessage(): IMessage {
 		$plainTextOnly = $this->config->getSystemValue('mail_send_plaintext_only', false);
-		return new Message(new \Swift_Message(), $plainTextOnly);
+		return new Message(new \Symfony\Component\Mime\Email(), $plainTextOnly);
 	}
 
 	/**
@@ -248,7 +248,7 @@ class Mailer implements IMailer {
 		return $name.'@'.$domain;
 	}
 
-	protected function getInstance(): \Swift_Mailer {
+	protected function getInstance(): \Symfony\Component\Mailer\MailerInterface {
 		if (!is_null($this->instance)) {
 			return $this->instance;
 		}
@@ -265,16 +265,16 @@ class Mailer implements IMailer {
 				break;
 		}
 
-		return new \Swift_Mailer($transport);
+		return new \Symfony\Component\Mailer\MailerInterface($transport);
 	}
 
 	/**
 	 * Returns the SMTP transport
 	 *
-	 * @return \Swift_SmtpTransport
+	 * @return \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport
 	 */
-	protected function getSmtpInstance(): \Swift_SmtpTransport {
-		$transport = new \Swift_SmtpTransport();
+	protected function getSmtpInstance(): \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport {
+		$transport = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport();
 		$transport->setTimeout($this->config->getSystemValue('mail_smtptimeout', 10));
 		$transport->setHost($this->config->getSystemValue('mail_smtphost', '127.0.0.1'));
 		$transport->setPort($this->config->getSystemValue('mail_smtpport', 25));
@@ -307,9 +307,9 @@ class Mailer implements IMailer {
 	/**
 	 * Returns the sendmail transport
 	 *
-	 * @return \Swift_SendmailTransport
+	 * @return \Symfony\Component\Mailer\Transport\SendmailTransport
 	 */
-	protected function getSendMailInstance(): \Swift_SendmailTransport {
+	protected function getSendMailInstance(): \Symfony\Component\Mailer\Transport\SendmailTransport {
 		switch ($this->config->getSystemValue('mail_smtpmode', 'smtp')) {
 			case 'qmail':
 				$binaryPath = '/var/qmail/bin/sendmail';
@@ -332,6 +332,6 @@ class Mailer implements IMailer {
 				break;
 		}
 
-		return new \Swift_SendmailTransport($binaryPath . $binaryParam);
+		return new \Symfony\Component\Mailer\Transport\SendmailTransport($binaryPath . $binaryParam);
 	}
 }
