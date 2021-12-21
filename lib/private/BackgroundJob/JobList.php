@@ -179,7 +179,7 @@ class JobList implements IJobList {
 	 *
 	 * @return IJob|null
 	 */
-	public function getNext() {
+	public function getNext(string $jobClass = null) {
 		$query = $this->connection->getQueryBuilder();
 		$query->select('*')
 			->from('jobs')
@@ -187,6 +187,10 @@ class JobList implements IJobList {
 			->andWhere($query->expr()->lte('last_checked', $query->createNamedParameter($this->timeFactory->getTime(), IQueryBuilder::PARAM_INT)))
 			->orderBy('last_checked', 'ASC')
 			->setMaxResults(1);
+
+		if ($jobClass) {
+			$query->andWhere($query->expr()->eq('class', $query->createNamedParameter($jobClass)));
+		}
 
 		$update = $this->connection->getQueryBuilder();
 		$update->update('jobs')

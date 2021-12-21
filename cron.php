@@ -119,7 +119,8 @@ try {
 		$endTime = time() + 14 * 60;
 
 		$executedJobs = [];
-		while ($job = $jobList->getNext()) {
+		$jobClass = isset($argv[1]) ? $argv[1] : null;
+		while ($job = $jobList->getNext($jobClass)) {
 			if (isset($executedJobs[$job->getId()])) {
 				$jobList->unlockJob($job);
 				break;
