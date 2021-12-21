@@ -77,7 +77,7 @@ class DummyJobList extends \OC\BackgroundJob\JobList {
 	 *
 	 * @return IJob|null
 	 */
-	public function getNext() {
+	public function getNext(string $jobClass = null) {
 		if (count($this->jobs) > 0) {
 			if ($this->last < (count($this->jobs) - 1)) {
 				$i = $this->last + 1;
