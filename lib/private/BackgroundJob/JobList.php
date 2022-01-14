@@ -212,7 +212,7 @@ class JobList implements IJobList {
 
 			if ($count === 0) {
 				// Background job already executed elsewhere, try again.
-				return $this->getNext();
+				return $this->getNext($jobClass);
 			}
 			$job = $this->buildJob($row);
 
@@ -226,7 +226,7 @@ class JobList implements IJobList {
 				$reset->execute();
 
 				// Background job from disabled app, try again.
-				return $this->getNext();
+				return $this->getNext($jobClass);
 			}
 
 			return $job;
