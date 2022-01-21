@@ -105,6 +105,7 @@ class SmbTest extends \Test\Files\Storage\Storage {
 		$this->instance->unlink('/renamed.txt');
 		sleep(1); //time for all changes to be processed
 
+		/** @var IChange[] $changes */
 		$changes = [];
 		$count = 0;
 		// wait up to 10 seconds for incoming changes
@@ -115,14 +116,23 @@ class SmbTest extends \Test\Files\Storage\Storage {
 		}
 		$notifyHandler->stop();
 
-		$expected = [
-			new Change(IChange::ADDED, 'newfile.txt'),
-			new RenameChange(IChange::RENAMED, 'newfile.txt', 'renamed.txt'),
-			new Change(IChange::REMOVED, 'renamed.txt')
-		];
+		// depending on the server environment, the initial create might be detected as a change instead
+		if ($changes[0]->getType() === IChange::MODIFIED) {
+			$expected = [
+				new Change(IChange::MODIFIED, 'newfile.txt'),
+				new RenameChange(IChange::RENAMED, 'newfile.txt', 'renamed.txt'),
+				new Change(IChange::REMOVED, 'renamed.txt')
+			];
+		} else {
+			$expected = [
+				new Change(IChange::ADDED, 'newfile.txt'),
+				new RenameChange(IChange::RENAMED, 'newfile.txt', 'renamed.txt'),
+				new Change(IChange::REMOVED, 'renamed.txt')
+			];
+		}
 
 		foreach ($expected as $expectedChange) {
-			$this->assertContains($expectedChange, $changes, 'Actual changes are:' . PHP_EOL . print_r($expected, true), false, false); // dont check object identity
+			$this->assertContains($expectedChange, $changes, "Expected changes are:\n" . print_r($expected, true) . "\nGot:\n" . print_r($changes, true), false, false); // dont check object identity
 		}
 	}
 
@@ -135,13 +145,18 @@ class SmbTest extends \Test\Files\Storage\Storage {
 
 		$result = null;
 
-		// since the notify handler buffers untill we start listening we will get the above changes
+		// since the notify handler buffers until we start listening we will get the above changes
 		$notifyHandler->listen(function (IChange $change) use (&$result) {
 			$result = $change;
 			return false;//stop listening
 		});
 
-		$this->assertEquals(new Change(IChange::ADDED, 'newfile.txt'), $result);
+		// depending on the server environment, the initial create might be detected as a change instead
+		if ($result->getType() === IChange::ADDED) {
+			$this->assertEquals(new Change(IChange::ADDED, 'newfile.txt'), $result);
+		} else {
+			$this->assertEquals(new Change(IChange::MODIFIED, 'newfile.txt'), $result);
+		}
 	}
 
 	public function testRenameRoot() {
