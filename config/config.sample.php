@@ -1355,9 +1355,12 @@ $CONFIG = [
  * Server details for one or more memcached servers to use for memory caching.
  */
 'memcached_servers' => [
-	// hostname, port and optional weight. Also see:
+	// hostname, port and optional weight
+	// or path and port 0 for unix socket. Also see:
 	// https://www.php.net/manual/en/memcached.addservers.php
 	// https://www.php.net/manual/en/memcached.addserver.php
+	// for local unix socket, use path instead of host
+	// and set port 0 (zero)
 	['localhost', 11211],
 	//array('other.host.local', 11211),
 ],
