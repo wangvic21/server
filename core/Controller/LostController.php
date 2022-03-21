@@ -36,6 +36,8 @@
 namespace OC\Core\Controller;
 
 use OC\Authentication\TwoFactorAuth\Manager;
+use OC\Core\Events\BeforePasswordResetEvent;
+use OC\Core\Events\PasswordResetEvent;
 use OC\Core\Exception\ResetPasswordException;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
@@ -43,6 +45,7 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Defaults;
 use OCP\Encryption\IEncryptionModule;
 use OCP\Encryption\IManager;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\HintException;
 use OCP\IConfig;
 use OCP\IInitialStateService;
@@ -92,6 +95,8 @@ class LostController extends Controller {
 	/** @var IVerificationToken */
 	private $verificationToken;
 
+	private IEventDispatcher $eventDispatcher;
+
 	public function __construct(
 		$appName,
 		IRequest $request,
@@ -106,7 +111,8 @@ class LostController extends Controller {
 		ILogger $logger,
 		Manager $twoFactorManager,
 		IInitialStateService $initialStateService,
-		IVerificationToken $verificationToken
+		IVerificationToken $verificationToken,
+		IEventDispatcher $eventDispatcher
 	) {
 		parent::__construct($appName, $request);
 		$this->urlGenerator = $urlGenerator;
@@ -121,6 +127,7 @@ class LostController extends Controller {
 		$this->twoFactorManager = $twoFactorManager;
 		$this->initialStateService = $initialStateService;
 		$this->verificationToken = $verificationToken;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -260,12 +267,14 @@ class LostController extends Controller {
 			$this->checkPasswordResetToken($token, $userId);
 			$user = $this->userManager->get($userId);
 
+			$this->eventDispatcher->dispatchTyped(new BeforePasswordResetEvent($user, $password));
 			\OC_Hook::emit('\OC\Core\LostPassword\Controller\LostController', 'pre_passwordReset', ['uid' => $userId, 'password' => $password]);
 
 			if (!$user->setPassword($password)) {
 				throw new \Exception();
 			}
 
+			$this->eventDispatcher->dispatchTyped(new PasswordResetEvent($user, $password));
 			\OC_Hook::emit('\OC\Core\LostPassword\Controller\LostController', 'post_passwordReset', ['uid' => $userId, 'password' => $password]);
 
 			$this->twoFactorManager->clearTwoFactorPending($userId);
