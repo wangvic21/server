@@ -25,39 +25,56 @@ namespace OC\Encryption;
 
 use OC\Files\Filesystem;
 use OC\Files\View;
+use OC\Files\SetupManager;
 use Psr\Log\LoggerInterface;
 
 class HookManager {
-	/**
-	 * @var Update
-	 */
-	private static $updater;
+	private static ?Update $updater = null;
+	private static bool $shouldTearDown = false;
 
-	public static function postShared($params) {
+	public static function postShared($params): void {
 		self::getUpdate()->postShared($params);
+		self::tearDown();
 	}
-	public static function postUnshared($params) {
+	public static function postUnshared($params): void {
 		self::getUpdate()->postUnshared($params);
+		self::tearDown();
 	}
 
-	public static function postRename($params) {
+	public static function postRename($params): void {
 		self::getUpdate()->postRename($params);
+		self::tearDown();
 	}
 
-	public static function postRestore($params) {
+	public static function postRestore($params): void {
 		self::getUpdate()->postRestore($params);
 	}
 
-	/**
-	 * @return Update
-	 */
-	private static function getUpdate() {
+	private static function tearDown(): void {
+		if (!self::$shouldTearDown) {
+			return;
+		}
+
+		$setupManager = \OC::$server->get(SetupManager::class);
+		$setupManager->tearDownFS(); // TODO ideally we should only tear down the user fs and not the root
+		self::$shouldTearDown = false;
+	}
+
+	private static function getUpdate(): Update {
 		if (is_null(self::$updater)) {
 			$user = \OC::$server->getUserSession()->getUser();
+
 			$uid = '';
 			if ($user) {
 				$uid = $user->getUID();
 			}
+
+			$setupManager = \OC::$server->get(SetupManager::class);
+			if (!$setupManager->isSetupComplete($user)) {
+				self::$shouldTearDown = true;
+				$setupManager->setupForUser($user);
+			}
+
 			self::$updater = new Update(
 				new View(),
 				new Util(
