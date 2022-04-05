@@ -48,6 +48,7 @@ class HookManager {
 
 	public static function postRestore($params): void {
 		self::getUpdate()->postRestore($params);
+		self::tearDown();
 	}
 
 	private static function tearDown(): void {
