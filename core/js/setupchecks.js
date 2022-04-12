@@ -203,6 +203,12 @@
 							type: OC.SetupChecks.MESSAGE_TYPE_INFO
 						});
 					}
+					if (!data.isPreviewMaxSetCorrectly) {
+						messages.push({
+							msg: t('core', 'Your preview max settings are not set correctly. Please set preview_max_x and preview_max_y in your config.php file to 2048 or higher in order to fix this.',),
+							type: OC.SetupChecks.MESSAGE_TYPE_INFO
+						});
+					}
 					if (!data.hasValidTransactionIsolationLevel) {
 						messages.push({
 							msg: t('core', 'Your database does not run with "READ COMMITTED" transaction isolation level. This can cause problems when multiple actions are executed in parallel.'),
