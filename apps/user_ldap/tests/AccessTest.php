@@ -44,6 +44,7 @@ use OCA\User_LDAP\Mapping\UserMapping;
 use OCA\User_LDAP\User\Manager;
 use OCA\User_LDAP\User\OfflineUser;
 use OCA\User_LDAP\User\User;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IAvatarManager;
 use OCP\IConfig;
 use OCP\Image;
@@ -81,8 +82,9 @@ class AccessTest extends TestCase {
 	private $ncUserManager;
 	/** @var LoggerInterface|MockObject */
 	private $logger;
-	/** @var Access */
-	private $access;
+	/** @var IEventDispatcher|MockObject */
+	private $dispatcher;
+	private Access $access;
 
 	protected function setUp(): void {
 		$this->connection = $this->createMock(Connection::class);
@@ -95,6 +97,7 @@ class AccessTest extends TestCase {
 		$this->ncUserManager = $this->createMock(IUserManager::class);
 		$this->shareManager = $this->createMock(IManager::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
+		$this->dispatcher = $this->createMock(IEventDispatcher::class);
 
 		$this->access = new Access(
 			$this->connection,
@@ -103,8 +106,10 @@ class AccessTest extends TestCase {
 			$this->helper,
 			$this->config,
 			$this->ncUserManager,
-			$this->logger
+			$this->logger,
+			$this->dispatcher
 		);
+		$this->dispatcher->expects($this->any())->method('dispatchTyped');;
 		$this->access->setUserMapper($this->userMapper);
 		$this->access->setGroupMapper($this->groupMapper);
 	}

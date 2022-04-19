@@ -33,6 +33,7 @@ use OCA\User_LDAP\Helper;
 use OCA\User_LDAP\LDAP;
 use OCA\User_LDAP\Mapping\UserMapping;
 use OCA\User_LDAP\User\Manager;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IAvatarManager;
 use OCP\IConfig;
 use OCP\IDBConnection;
@@ -47,8 +48,7 @@ class Sync extends TimedJob {
 	protected $ldapHelper;
 	/** @var  LDAP */
 	protected $ldap;
-	/** @var  Manager */
-	protected $userManager;
+	protected Manager $userManager;
 	/** @var UserMapping */
 	protected $mapper;
 	/** @var  IConfig */
@@ -67,8 +67,9 @@ class Sync extends TimedJob {
 	protected $connectionFactory;
 	/** @var AccessFactory */
 	protected $accessFactory;
+	protected IEventDispatcher $dispatcher;
 
-	public function __construct(Manager  $userManager) {
+	public function __construct(Manager $userManager) {
 		$this->userManager = $userManager;
 		$this->setInterval(
 			\OC::$server->getConfig()->getAppValue(
@@ -77,6 +78,7 @@ class Sync extends TimedJob {
 				self::MIN_INTERVAL
 			)
 		);
+		$this->dispatcher = \OC::$server->get(IEventDispatcher::class);
 	}
 
 	/**
@@ -375,7 +377,8 @@ class Sync extends TimedJob {
 				$this->ldapHelper,
 				$this->config,
 				$this->ncUserManager,
-				$this->logger
+				$this->logger,
+				$this->dispatcher,
 			);
 		}
 	}
