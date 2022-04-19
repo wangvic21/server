@@ -1580,8 +1580,6 @@ class ComposerStaticInit53792487c5a8370acc0b06b1a864ff4c
         'OC\\User\\User' => __DIR__ . '/../../..' . '/lib/private/User/User.php',
         'OC_API' => __DIR__ . '/../../..' . '/lib/private/legacy/OC_API.php',
         'OC_App' => __DIR__ . '/../../..' . '/lib/private/legacy/OC_App.php',
-        'OC_DB' => __DIR__ . '/../../..' . '/lib/private/legacy/OC_DB.php',
-        'OC_DB_StatementWrapper' => __DIR__ . '/../../..' . '/lib/private/legacy/OC_DB_StatementWrapper.php',
         'OC_Defaults' => __DIR__ . '/../../..' . '/lib/private/legacy/OC_Defaults.php',
         'OC_EventSource' => __DIR__ . '/../../..' . '/lib/private/legacy/OC_EventSource.php',
         'OC_FileChunking' => __DIR__ . '/../../..' . '/lib/private/legacy/OC_FileChunking.php',
