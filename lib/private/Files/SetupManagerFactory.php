@@ -47,6 +47,7 @@ class SetupManagerFactory {
 	private ICacheFactory $cacheFactory;
 	private LoggerInterface $logger;
 	private IConfig $config;
+	private IEventDispatcher $dispatcher;
 
 	public function __construct(
 		IEventLogger $eventLogger,
@@ -58,7 +59,8 @@ class SetupManagerFactory {
 		IUserSession $userSession,
 		ICacheFactory $cacheFactory,
 		LoggerInterface $logger,
-		IConfig $config
+		IConfig $config,
+		IEventDispatcher $dispatcher
 	) {
 		$this->eventLogger = $eventLogger;
 		$this->mountProviderCollection = $mountProviderCollection;
@@ -71,6 +73,7 @@ class SetupManagerFactory {
 		$this->logger = $logger;
 		$this->config = $config;
 		$this->setupManager = null;
+		$this->dispatcher = $dispatcher;
 	}
 
 	public function create(IMountManager $mountManager): SetupManager {
@@ -86,7 +89,8 @@ class SetupManagerFactory {
 				$this->userSession,
 				$this->cacheFactory,
 				$this->logger,
-				$this->config
+				$this->config,
+				$this->dispatcher,
 			);
 		}
 		return $this->setupManager;

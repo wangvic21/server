@@ -46,10 +46,10 @@ use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\Node;
 use OCP\Files\Storage\IStorage;
-use OCP\ILogger;
 use OCP\IUserManager;
 use OCP\Lock\ILockingProvider;
 use OCP\Share\IShare;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Test\Traits\MountProviderTrait;
 
@@ -571,7 +571,7 @@ class StorageTest extends \Test\TestCase {
 			->disableOriginalConstructor()->getMock();
 		$userManager->expects($this->any())
 			->method('userExists')->willReturn($userExists);
-		$logger = $this->getMockBuilder(ILogger::class)->getMock();
+		$logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
 		$eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 		$rootFolder = $this->createMock(IRootFolder::class);
 		$userFolder = $this->createMock(Folder::class);

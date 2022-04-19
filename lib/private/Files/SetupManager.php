@@ -43,6 +43,7 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Config\IHomeMountProvider;
 use OCP\Files\Config\IMountProvider;
 use OCP\Files\Config\IUserMountCache;
+use OCP\Files\Events\BeforeFileSystemSetupEvent;
 use OCP\Files\Events\InvalidateMountCacheEvent;
 use OCP\Files\Events\Node\FilesystemTornDownEvent;
 use OCP\Files\Mount\IMountManager;
@@ -82,6 +83,7 @@ class SetupManager {
 	private IConfig $config;
 	private bool $listeningForProviders;
 	private array $fullSetupRequired = [];
+	private IEventDispatcher $dispatcher;
 
 	public function __construct(
 		IEventLogger $eventLogger,
@@ -94,7 +96,8 @@ class SetupManager {
 		IUserSession $userSession,
 		ICacheFactory $cacheFactory,
 		LoggerInterface $logger,
-		IConfig $config
+		IConfig $config,
+		IEventDispatcher $dispatcher
 	) {
 		$this->eventLogger = $eventLogger;
 		$this->mountProviderCollection = $mountProviderCollection;
@@ -108,6 +111,7 @@ class SetupManager {
 		$this->cache = $cacheFactory->createDistributed('setupmanager::');
 		$this->listeningForProviders = false;
 		$this->config = $config;
+		$this->dispatcher = $dispatcher;
 
 		$this->setupListeners();
 	}
@@ -223,7 +227,11 @@ class SetupManager {
 		$this->setupUsers[] = $user->getUID();
 		$prevLogging = Filesystem::logWarningWhenAddingStorageWrapper(false);
 
+		// TODO remove hook
 		OC_Hook::emit('OC_Filesystem', 'preSetup', ['user' => $user->getUID()]);
+
+		$event = new BeforeFileSystemSetupEvent($user);
+		$this->dispatcher->dispatchTyped($event);
 
 		Filesystem::logWarningWhenAddingStorageWrapper($prevLogging);
 

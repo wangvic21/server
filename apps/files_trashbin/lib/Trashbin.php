@@ -44,6 +44,7 @@
  */
 namespace OCA\Files_Trashbin;
 
+use OCP\Files\Node;
 use OC_User;
 use OC\Files\Cache\Cache;
 use OC\Files\Cache\CacheEntry;
@@ -54,6 +55,9 @@ use OC\Files\View;
 use OCA\Files_Trashbin\AppInfo\Application;
 use OCA\Files_Trashbin\Command\Expire;
 use OCP\AppFramework\Utility\ITimeFactory;
+use OCP\EventDispatcher\Event;
+use OCP\EventDispatcher\IEventListener;
+use OCP\Files\Events\Node\BeforeNodeDeletedEvent;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\NotFoundException;
@@ -62,7 +66,7 @@ use OCP\Lock\ILockingProvider;
 use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
 
-class Trashbin {
+class Trashbin implements IEventListener {
 
 	// unit: percentage; 50% of available disk space/quota
 	public const DEFAULTMAXSIZE = 50;
@@ -77,14 +81,12 @@ class Trashbin {
 	/**
 	 * Ensure we don't need to scan the file during the move to trash
 	 * by triggering the scan in the pre-hook
-	 *
-	 * @param array $params
 	 */
-	public static function ensureFileScannedHook($params) {
+	public static function ensureFileScannedHook(Node $node): void {
 		try {
-			self::getUidAndFilename($params['path']);
+			self::getUidAndFilename($node->getPath());
 		} catch (NotFoundException $e) {
-			// nothing to scan for non existing files
+			// Nothing to scan for non existing files
 		}
 	}
 
@@ -1141,5 +1143,12 @@ class Trashbin {
 	 */
 	public static function preview_icon($path) {
 		return \OC::$server->getURLGenerator()->linkToRoute('core_ajax_trashbin_preview', ['x' => 32, 'y' => 32, 'file' => $path]);
+	}
+
+	public function handle(Event $event): void {
+		if ($event instanceof BeforeNodeDeletedEvent) {
+			self::ensureFileScannedHook($event->getNode());
+
+		}
 	}
 }
