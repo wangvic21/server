@@ -56,7 +56,7 @@ class AccessFactory {
 		$this->dispatcher = $dispatcher;
 	}
 
-	public function get(Connection $connection) {
+	public function get(Connection $connection): Access {
 		return new Access(
 			$connection,
 			$this->ldap,

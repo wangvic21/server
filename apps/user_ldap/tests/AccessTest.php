@@ -128,6 +128,8 @@ class AccessTest extends TestCase {
 				$this->createMock(Image::class),
 				$this->createMock(IUserManager::class),
 				$this->createMock(INotificationManager::class),
+				$this->createMock(IManager::class),
+				$this->createMock(IEventDispatcher::class),
 				$this->shareManager])
 			->getMock();
 		$helper = new Helper(\OC::$server->getConfig(), \OC::$server->getDatabaseConnection());
@@ -248,7 +250,7 @@ class AccessTest extends TestCase {
 		[$lw, $con, $um, $helper] = $this->getConnectorAndLdapMock();
 		/** @var IConfig|\PHPUnit\Framework\MockObject\MockObject $config */
 		$config = $this->createMock(IConfig::class);
-		$access = new Access($con, $lw, $um, $helper, $config, $this->ncUserManager, $this->logger);
+		$access = new Access($con, $lw, $um, $helper, $config, $this->ncUserManager, $this->logger, $this->dispatcher);
 
 		$lw->expects($this->exactly(1))
 			->method('explodeDN')
@@ -271,7 +273,7 @@ class AccessTest extends TestCase {
 		/** @var IConfig|\PHPUnit\Framework\MockObject\MockObject $config */
 		$config = $this->createMock(IConfig::class);
 		$lw = new LDAP();
-		$access = new Access($con, $lw, $um, $helper, $config, $this->ncUserManager, $this->logger);
+		$access = new Access($con, $lw, $um, $helper, $config, $this->ncUserManager, $this->logger, $this->dispatcher);
 
 		if (!function_exists('ldap_explode_dn')) {
 			$this->markTestSkipped('LDAP Module not available');
@@ -452,7 +454,7 @@ class AccessTest extends TestCase {
 				$attribute => ['count' => 1, $dnFromServer]
 			]);
 
-		$access = new Access($con, $lw, $um, $helper, $config, $this->ncUserManager, $this->logger);
+		$access = new Access($con, $lw, $um, $helper, $config, $this->ncUserManager, $this->logger, $this->dispatcher);
 		$values = $access->readAttribute('uid=whoever,dc=example,dc=org', $attribute);
 		$this->assertSame($values[0], strtolower($dnFromServer));
 	}
