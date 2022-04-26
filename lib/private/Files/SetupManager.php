@@ -242,6 +242,15 @@ class SetupManager {
 				$homeMount->getStorage()->mkdir('');
 				$homeMount->getStorage()->getScanner()->scan('');
 			}
+
+			$provider = $homeMount->getMountProvider();
+			$this->userMountCache->registerMounts($user, [$homeMount], [$provider]);
+			if (!isset($this->setupUserMountProviders[$user->getUID()])) {
+				$this->setupUserMountProviders[$user->getUID()] = [];
+			}
+			if (!in_array($provider, $this->setupUserMountProviders[$user->getUID()])) {
+				$this->setupUserMountProviders[$user->getUID()][] = $provider;
+			}
 		} else {
 			$this->mountManager->addMount(new MountPoint(
 				new NullStorage([]),
