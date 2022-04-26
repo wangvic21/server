@@ -26,6 +26,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
  *
  */
+
 namespace OC\Files\Config;
 
 use OC\Cache\CappedMemoryCache;
@@ -56,12 +57,7 @@ class UserMountCache implements IUserMountCache {
 	 */
 	private $userManager;
 
-	/**
-	 * Cached mount info.
-	 * Map of $userId to ICachedMountInfo.
-	 *
-	 * @var ICache
-	 **/
+	/** @var CappedMemoryCache<ICachedMountInfo[]> */
 	private $mountsForUsers;
 
 	private LoggerInterface $logger;
@@ -104,7 +100,9 @@ class UserMountCache implements IUserMountCache {
 
 		$cachedMounts = $this->getMountsForUser($user);
 		if (is_array($mountProviderClasses)) {
-			$cachedMounts = array_filter($cachedMounts, function (ICachedMountInfo $mountInfo) use ($mountProviderClasses) {
+			$cachedMounts = array_filter($cachedMounts, function (ICachedMountInfo $mountInfo) use (
+				$mountProviderClasses
+			) {
 				return in_array($mountInfo->getMountProvider(), $mountProviderClasses);
 			});
 		}
@@ -113,7 +111,9 @@ class UserMountCache implements IUserMountCache {
 		}, $cachedMounts);
 		$cachedMounts = array_combine($cachedMountRootIds, $cachedMounts);
 
+		/** @var ICachedMountInfo[] $addedMounts */
 		$addedMounts = [];
+		/** @var ICachedMountInfo[] $removedMounts */
 		$removedMounts = [];
 
 		foreach ($newMounts as $rootId => $newMount) {
@@ -129,15 +129,21 @@ class UserMountCache implements IUserMountCache {
 		}
 
 		$changedMounts = $this->findChangedMounts($newMounts, $cachedMounts);
+		$mountsForUsers = &$this->mountsForUsers[$user->getUID()];
 
 		foreach ($addedMounts as $mount) {
 			$this->addToCache($mount);
-			$this->mountsForUsers[$user->getUID()][] = $mount;
+			$mountsForUsers[] = $mount;
 		}
 		foreach ($removedMounts as $mount) {
 			$this->removeFromCache($mount);
-			$index = array_search($mount, $this->mountsForUsers[$user->getUID()]);
-			unset($this->mountsForUsers[$user->getUID()][$index]);
+			foreach ($mountsForUsers as $index => $mountForUser) {
+				/** @var ICachedMountInfo $mountForUser */
+				if ($mount->getRootId() == $mountForUser->getRootId() && $mount->getMountPoint() == $mountForUser->getMountPoint()) {
+					unset($mountsForUsers[$index]);
+					break;
+				}
+			}
 		}
 		foreach ($changedMounts as $mount) {
 			$this->updateCachedMount($mount);
@@ -313,7 +319,7 @@ class UserMountCache implements IUserMountCache {
 				$this->cacheInfoCache[$fileId] = [
 					(int)$row['storage'],
 					(string)$row['path'],
-					(int)$row['mimetype']
+					(int)$row['mimetype'],
 				];
 			} else {
 				throw new NotFoundException('File with id "' . $fileId . '" not found');
