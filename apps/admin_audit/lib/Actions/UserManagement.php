@@ -40,7 +40,7 @@ use OCP\User\Events\UserChangedEvent;
 use OCP\User\Events\UserCreatedEvent;
 use OCP\User\Events\UserDeletedEvent;
 use OCP\User\Events\UserIdAssignedEvent;
-use OCP\User\Events\UserIdUnAssignedEvent;
+use OCP\User\Events\UserIdUnassignedEvent;
 
 /**
  * Class UserManagement logs all user management related actions.
@@ -51,25 +51,15 @@ class UserManagement extends Action implements IEventListener {
 	public function handle(Event $event): void {
 		if ($event instanceof UserCreatedEvent) {
 			$this->create($event->getUser()->getUID());
-		}
-
-		if ($event instanceof UserDeletedEvent) {
+		} else if ($event instanceof UserDeletedEvent) {
 			$this->delete($event->getUser()->getUID());
-		}
-
-		if ($event instanceof UserChangedEvent) {
+		} else if ($event instanceof UserChangedEvent) {
 			$this->change($event);
-		}
-
-		if ($event instanceof UserIdAssignedEvent) {
-			$this->assign($event->getName());
-		}
-
-		if ($event instanceof UserIdUnassignedEvent) {
-			$this->assign($event->getName());
-		}
-
-		if ($event instanceof PasswordUpdatedEvent) {
+		} else if ($event instanceof UserIdAssignedEvent) {
+			$this->assign($event->getUserId());
+		} else if ($event instanceof UserIdUnassignedEvent) {
+			$this->unassign($event->getUserId());
+		} else if ($event instanceof PasswordUpdatedEvent) {
 			$this->setPassword($event->getUser());
 		}
 	}

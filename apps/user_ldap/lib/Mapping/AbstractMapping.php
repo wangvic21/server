@@ -256,7 +256,7 @@ abstract class AbstractMapping {
 			$qb->setParameter('hashList', $fdnsSlice, IQueryBuilder::PARAM_STR_ARRAY);
 			$this->collectResultsFromListOfIdsQuery($qb, $results);
 			$slice++;
-		} while (count($fdnsSlice) === 1000);
+		} while (count($fdnsSlice) >= 1000);
 
 		return $results;
 	}

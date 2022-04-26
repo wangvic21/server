@@ -76,7 +76,7 @@ use OCP\User\Events\PasswordUpdatedEvent;
 use OCP\User\Events\UserChangedEvent;
 use OCP\User\Events\UserCreatedEvent;
 use OCP\User\Events\UserDeletedEvent;
-use OCP\User\Events\UserIdUnAssignedEvent;
+use OCP\User\Events\UserIdUnassignedEvent;
 use OCP\User\Events\UserLoggedInEvent;
 use OCP\User\Events\UserLoggedOutEvent;
 use OCP\Util;
@@ -107,7 +107,7 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(UserChangedEvent::class, UserManagement::class);
 		$context->registerEventListener(PasswordUpdatedEvent::class, UserManagement::class);
 		$context->registerEventListener(UserIdAssignedEvent::class, UserManagement::class);
-		$context->registerEventListener(UserIdUnAssignedEvent::class, UserManagement::class);
+		$context->registerEventListener(UserIdUnassignedEvent::class, UserManagement::class);
 
 		// Group management
 		$context->registerEventListener(GroupCreatedEvent::class, GroupManagement::class);

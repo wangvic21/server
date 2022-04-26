@@ -7,21 +7,21 @@ use OCP\EventDispatcher\Event;
 /**
  * @since 25.0.0
  */
-class BeforeUserIdUnAssignedEvent extends Event {
-	private string $name;
+class BeforeUserIdUnassignedEvent extends Event {
+	private string $userId;
 
 	/**
 	 * @since 25.0.0
 	 */
-	public function __construct(string $name) {
+	public function __construct(string $userId) {
 		parent::__construct();
-		$this->name = $name;
+		$this->userId = $userId;
 	}
 
 	/**
 	 * @since 25.0.0
 	 */
-	public function getName(): string {
-		return $this->name;
+	public function getUserId(): string {
+		return $this->userId;
 	}
 }

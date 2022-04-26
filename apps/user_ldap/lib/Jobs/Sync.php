@@ -25,9 +25,6 @@
  */
 namespace OCA\User_LDAP\Jobs;
 
-use OCA\User_LDAP\User\User;
-use OCP\AppFramework\Utility\ITimeFactory;
-use OCP\BackgroundJob\TimedJob;
 use OC\ServerNotAvailableException;
 use OCA\User_LDAP\AccessFactory;
 use OCA\User_LDAP\Configuration;
@@ -36,6 +33,9 @@ use OCA\User_LDAP\Helper;
 use OCA\User_LDAP\LDAP;
 use OCA\User_LDAP\Mapping\UserMapping;
 use OCA\User_LDAP\User\Manager;
+use OCA\User_LDAP\User\User;
+use OCP\AppFramework\Utility\ITimeFactory;
+use OCP\BackgroundJob\TimedJob;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IAvatarManager;
 use OCP\IConfig;

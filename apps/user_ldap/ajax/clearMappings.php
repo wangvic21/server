@@ -26,8 +26,8 @@
 use OCA\User_LDAP\Mapping\UserMapping;
 use OCA\User_LDAP\Mapping\GroupMapping;
 use OCP\EventDispatcher\IEventDispatcher;
-use OCP\User\Events\BeforeUserIdUnAssignedEvent;
-use OCP\User\Events\UserIdUnAssignedEvent;
+use OCP\User\Events\BeforeUserIdUnassignedEvent;
+use OCP\User\Events\UserIdUnassignedEvent;
 
 // Check user and app status
 \OC_JSON::checkAdminUser();
@@ -42,12 +42,12 @@ try {
 		/** @var IEventDispatcher $dispatcher */
 		$dispatcher = \OC::$server->get(IEventDispatcher::class);
 		$result = $mapping->clearCb(
-			function ($uid) use ($dispatcher) {
-				$dispatcher->dispatchTyped(new BeforeUserIdUnAssignedEvent($uid));
+			function (string $uid) use ($dispatcher): void {
+				$dispatcher->dispatchTyped(new BeforeUserIdUnassignedEvent($uid));
 				\OC::$server->getUserManager()->emit('\OC\User', 'preUnassignedUserId', [$uid]);
 			},
-			function ($uid) use ($dispatcher) {
-				$dispatcher->dispatchTyped(new UserIdUnAssignedEvent($uid));
+			function (string $uid) use ($dispatcher): void {
+				$dispatcher->dispatchTyped(new UserIdUnassignedEvent($uid));
 				\OC::$server->getUserManager()->emit('\OC\User', 'postUnassignedUserId', [$uid]);
 			}
 		);
