@@ -97,8 +97,10 @@ class CryptoSessionData implements \ArrayAccess, ISession {
 	 * @param mixed $value
 	 */
 	public function set(string $key, $value) {
+		$this->reopen();
 		$this->sessionValues[$key] = $value;
 		$this->isModified = true;
+		$this->close();
 	}
 
 	/**
@@ -131,9 +133,11 @@ class CryptoSessionData implements \ArrayAccess, ISession {
 	 * @param string $key
 	 */
 	public function remove(string $key) {
+		$this->reopen();
 		$this->isModified = true;
 		unset($this->sessionValues[$key]);
 		$this->session->remove(self::encryptedSessionName);
+		$this->close();
 	}
 
 	/**
@@ -147,6 +151,10 @@ class CryptoSessionData implements \ArrayAccess, ISession {
 		}
 		$this->isModified = true;
 		$this->session->clear();
+	}
+
+	public function reopen() {
+		$this->session->reopen();
 	}
 
 	/**
@@ -180,7 +188,6 @@ class CryptoSessionData implements \ArrayAccess, ISession {
 			$this->session->set(self::encryptedSessionName, $encryptedValue);
 			$this->isModified = false;
 		}
-		$this->session->close();
 	}
 
 	/**

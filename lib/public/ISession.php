@@ -84,6 +84,14 @@ interface ISession {
 	public function clear();
 
 	/**
+	 * Reopen a session for writing again
+	 *
+	 * @return mixed
+	 * @since 25.0.0
+	 */
+	public function reopen();
+
+	/**
 	 * Close the session and release the lock
 	 * @since 7.0.0
 	 */
