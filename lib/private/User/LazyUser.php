@@ -30,12 +30,14 @@ class LazyUser implements IUser {
 	private ?IUser $user = null;
 	private DisplayNameCache $displayNameCache;
 	private string $uid;
+	private ?string $displayName;
 	private IUserManager $userManager;
 
-	public function __construct(string $uid, DisplayNameCache $displayNameCache, IUserManager $userManager) {
+	public function __construct(string $uid, DisplayNameCache $displayNameCache, IUserManager $userManager, ?string $displayName = null) {
 		$this->displayNameCache = $displayNameCache;
 		$this->uid = $uid;
 		$this->userManager = $userManager;
+		$this->displayName = $displayName;
 	}
 
 	private function getUser(): IUser {
@@ -52,6 +54,10 @@ class LazyUser implements IUser {
 	}
 
 	public function getDisplayName() {
+		if ($this->displayName) {
+			return $this->displayName;
+		}
+
 		return $this->displayNameCache->getDisplayName($this->uid);
 	}
 
