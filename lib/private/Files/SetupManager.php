@@ -239,8 +239,10 @@ class SetupManager {
 			$this->mountManager->addMount($homeMount);
 
 			if ($homeMount->getStorageRootId() === -1) {
-				$homeMount->getStorage()->mkdir('');
-				$homeMount->getStorage()->getScanner()->scan('');
+				$homeStorage = $homeMount->getStorage();
+				$homeStorage->mkdir('');
+				$homeStorage->mkdir('files');
+				$homeStorage->getScanner()->scan('');
 			}
 
 			$provider = $homeMount->getMountProvider();

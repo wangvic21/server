@@ -75,9 +75,13 @@ class ObjectStoreStorage extends \OC\Files\Storage\Common {
 		if (isset($params['objectPrefix'])) {
 			$this->objectPrefix = $params['objectPrefix'];
 		}
-		//initialize cache with root directory in cache
-		if (!$this->is_dir('/')) {
-			$this->mkdir('/');
+
+		// home storage is setup in the SetupManager
+		if (!$this instanceof HomeObjectStoreStorage) {
+			//initialize cache with root directory in cache
+			if (!$this->is_dir('/')) {
+				$this->mkdir('/');
+			}
 		}
 
 		$this->logger = \OC::$server->getLogger();
