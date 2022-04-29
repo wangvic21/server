@@ -72,8 +72,6 @@ class AccountMigrator implements IMigrator {
 	 * {@inheritDoc}
 	 */
 	public function getEstimatedExportSize(IUser $user): int {
-		$uid = $user->getUID();
-
 		$size = 100; // 100KiB for account JSON
 
 		try {
@@ -83,7 +81,7 @@ class AccountMigrator implements IMigrator {
 				$size += $avatarFile->getSize() / 1024;
 			}
 		} catch (Throwable $e) {
-			return 0;
+			// Skip avatar in size estimate on failure
 		}
 
 		return (int)ceil($size);
