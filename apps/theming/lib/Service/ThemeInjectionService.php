@@ -22,6 +22,7 @@
  */
 namespace OCA\Theming\Service;
 
+use OCA\Theming\ITheme;
 use OCA\Theming\Themes\DefaultTheme;
 use OCP\IURLGenerator;
 use OCP\Util;
@@ -49,11 +50,11 @@ class ThemeInjectionService {
 		});
 
 		// Default theme fallback
-		$this->addThemeHeader($defaultTheme->getId());
+		$this->addThemeHeaders($defaultTheme);
 		
 		// Themes applied by media queries
 		foreach($mediaThemes as $theme) {
-			$this->addThemeHeader($theme->getId(), true, $theme->getMediaQuery());
+			$this->addThemeHeaders($theme, true, $theme->getMediaQuery());
 		}
 
 		// Themes 
@@ -62,7 +63,7 @@ class ThemeInjectionService {
 			if ($theme->getId() === $this->defaultTheme->getId()) {
 				continue;
 			}
-			$this->addThemeHeader($theme->getId(), false);
+			$this->addThemeHeaders($theme, false);
 		}
 	}
 
@@ -73,9 +74,9 @@ class ThemeInjectionService {
 	 * @param bool $plain request the :root syntax
 	 * @param string $media media query to use in the <link> element
 	 */
-	private function addThemeHeader(string $themeId, bool $plain = true, string $media = null) {
+	private function addThemeHeaders(ITheme $theme, bool $plain = true, string $media = null) {
 		$linkToCSS = $this->urlGenerator->linkToRoute('theming.Theming.getThemeStylesheet', [
-			'themeId' => $themeId,
+			'themeId' => $theme->getId(),
 			'plain' => $plain,
 		]);
 		Util::addHeader('link', [
@@ -84,5 +85,9 @@ class ThemeInjectionService {
 			'href' => $linkToCSS,
 			'class' => 'theme'
 		]);
+
+		if (!empty($theme->getMeta())) {
+			Util::addHeader('meta', $theme->getMeta());
+		}
 	}
 }
