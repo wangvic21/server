@@ -1262,7 +1262,6 @@ class ComposerStaticInit53792487c5a8370acc0b06b1a864ff4c
         'OC\\FullTextSearch\\Model\\SearchRequestSimpleQuery' => __DIR__ . '/../../..' . '/lib/private/FullTextSearch/Model/SearchRequestSimpleQuery.php',
         'OC\\FullTextSearch\\Model\\SearchTemplate' => __DIR__ . '/../../..' . '/lib/private/FullTextSearch/Model/SearchTemplate.php',
         'OC\\GlobalScale\\Config' => __DIR__ . '/../../..' . '/lib/private/GlobalScale/Config.php',
-        'OC\\Group\\Backend' => __DIR__ . '/../../..' . '/lib/private/Group/Backend.php',
         'OC\\Group\\Database' => __DIR__ . '/../../..' . '/lib/private/Group/Database.php',
         'OC\\Group\\Group' => __DIR__ . '/../../..' . '/lib/private/Group/Group.php',
         'OC\\Group\\Manager' => __DIR__ . '/../../..' . '/lib/private/Group/Manager.php',
