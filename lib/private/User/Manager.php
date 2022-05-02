@@ -92,13 +92,12 @@ class Manager extends PublicEmitter implements IUserManager {
 
 	/** @var IEventDispatcher */
 	private $eventDispatcher;
-	private DisplayNameCache $displayNameCache;
+	private ?DisplayNameCache $displayNameCache = null;
 
 	public function __construct(IConfig $config,
 								EventDispatcherInterface $oldDispatcher,
 								ICacheFactory $cacheFactory,
-								IEventDispatcher $eventDispatcher,
-								DisplayNameCache $displayNameCache) {
+								IEventDispatcher $eventDispatcher) {
 		$this->config = $config;
 		$this->dispatcher = $oldDispatcher;
 		$this->cache = $cacheFactory->createDistributed('user_backend_map');
@@ -108,7 +107,6 @@ class Manager extends PublicEmitter implements IUserManager {
 			unset($cachedUsers[$user->getUID()]);
 		});
 		$this->eventDispatcher = $eventDispatcher;
-		$this->displayNameCache = $displayNameCache;
 	}
 
 	/**
@@ -320,6 +318,7 @@ class Manager extends PublicEmitter implements IUserManager {
 	 * @return \OC\User\User[]
 	 */
 	public function searchDisplayName($pattern, $limit = null, $offset = null) {
+		$this->displayNameCache = \OC::$server->get(DisplayNameCache::class);
 		$users = [];
 		foreach ($this->backends as $backend) {
 			$backendUsers = $backend->getDisplayNames($pattern, $limit, $offset);
