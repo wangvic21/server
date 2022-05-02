@@ -25,6 +25,7 @@ namespace OC\User;
 
 use OCP\IUser;
 use OCP\IUserManager;
+use OCP\UserInterface;
 
 class LazyUser implements IUser {
 	private ?IUser $user = null;
@@ -32,17 +33,25 @@ class LazyUser implements IUser {
 	private string $uid;
 	private ?string $displayName;
 	private IUserManager $userManager;
+	private ?UserInterface $backend;
 
-	public function __construct(string $uid, DisplayNameCache $displayNameCache, IUserManager $userManager, ?string $displayName = null) {
+	public function __construct(string $uid, DisplayNameCache $displayNameCache, IUserManager $userManager, ?string $displayName = null, ?UserInterface $backend = null) {
 		$this->displayNameCache = $displayNameCache;
 		$this->uid = $uid;
 		$this->userManager = $userManager;
 		$this->displayName = $displayName;
+		$this->backend = $backend;
 	}
 
 	private function getUser(): IUser {
 		if ($this->user === null) {
-			$this->user = $this->userManager->get($this->uid);
+			if ($this->backend) {
+				/** @var \OC\User\Manager $manager */
+				$manager = $this->userManager;
+				$this->user = $manager->getUserObject($this->uid, $this->backend);
+			} else {
+				$this->user = $this->userManager->get($this->uid);
+			}
 		}
 		/** @var IUser */
 		$user = $this->user;
