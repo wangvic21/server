@@ -37,7 +37,11 @@ class HookManager {
 		self::tearDown();
 	}
 	public static function postUnshared($params): void {
-		self::getUpdate()->postUnshared($params);
+		// In case the unsharing happens in a background job, we don't have
+		// a session and we load instead the user from the UserManager
+		$path = Filesystem::getPath($params['fileSource']);
+		$owner = Filesystem::getOwner($path);
+		self::getUpdate($owner)->postUnshared($params);
 		self::tearDown();
 	}
 
@@ -61,9 +65,15 @@ class HookManager {
 		self::$shouldTearDown = false;
 	}
 
-	private static function getUpdate(): Update {
+	private static function getUpdate(?string $owner = null): Update {
 		if (is_null(self::$updater)) {
 			$user = \OC::$server->getUserSession()->getUser();
+			if (!$user && $owner) {
+				$user = \OC::$server->getUserManager()->get($owner);
+			}
+			if (!$user) {
+				throw new Exception("Inconsistent data, File unshared, but owner not found. Should not happen");
+			}
 
 			$uid = '';
 			if ($user) {
