@@ -87,6 +87,7 @@ class ObjectStoreStorage extends \OC\Files\Storage\Common {
 		$path = $this->normalizePath($path);
 
 		if ($this->file_exists($path)) {
+			$this->logger->warning("Tried to create an object store folder that already exists");
 			return false;
 		}
 
@@ -110,10 +111,12 @@ class ObjectStoreStorage extends \OC\Files\Storage\Common {
 			if ($parentType === false) {
 				if (!$this->mkdir($parent)) {
 					// something went wrong
+					$this->logger->warning("Parent folder doesn't exist and couldn't be created");
 					return false;
 				}
 			} elseif ($parentType === 'file') {
 				// parent is a file
+				$this->logger->warning("Parent is a file");
 				return false;
 			}
 			// finally create the new dir
