@@ -102,7 +102,7 @@ class PublicAuth extends AbstractBasic {
 				return [false, 'Username or password was incorrect'];
 			}
 
-			return $this->checkToken($request);
+			return $this->checkToken();
 		} catch (NotAuthenticated $e) {
 			throw $e;
 		} catch (\Exception $e) {
@@ -122,7 +122,7 @@ class PublicAuth extends AbstractBasic {
 		$path = $this->request->getPathInfo();
 		// ['', 'dav', 'files', 'token']
 		$token = explode('/', $path)[3] ?: '';
-		if (!is_string($token) || !$token) {
+		if ($token === '') {
 			throw new NotFound();
 		}
 
