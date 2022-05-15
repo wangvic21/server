@@ -38,7 +38,7 @@ OC_Util::obEnd();
 \OC::$server->getSession()->close();
 
 // Backends
-$authBackend = new OCA\DAV\Connector\LegacyPublicAuth(
+$authBackend = new OCA\DAV\Connector\Sabre\PublicAuth(
 	\OC::$server->getRequest(),
 	\OC::$server->getShareManager(),
 	\OC::$server->getSession(),
@@ -63,6 +63,10 @@ $requestUri = \OC::$server->getRequest()->getRequestUri();
 
 $linkCheckPlugin = new \OCA\DAV\Files\Sharing\PublicLinkCheckPlugin();
 $filesDropPlugin = new \OCA\DAV\Files\Sharing\FilesDropPlugin();
+
+// Define root url with /public.php/dav/files/TOKEN
+preg_match('/(^files\/\w+)/i', substr($requestUri, strlen($baseuri)), $match);
+$baseuri = $baseuri . $match[0];
 
 $server = $serverFactory->createServer($baseuri, $requestUri, $authPlugin, function (\Sabre\DAV\Server $server) use ($authBackend, $linkCheckPlugin, $filesDropPlugin) {
 	$isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
