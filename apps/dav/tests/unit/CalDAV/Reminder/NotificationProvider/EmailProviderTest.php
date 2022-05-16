@@ -284,7 +284,7 @@ class EmailProviderTest extends AbstractNotificationProviderTest {
 		$message22 = $this->getMessageMock('foo4@example.org', $template2);
 		$message23 = $this->getMessageMock('uid1@example.com', $template2);
 
-		$this->mailer->expects($this->at(0))
+		$this->mailer->expects(self::exactly(2))
 			->method('createEMailTemplate')
 			->with('dav.calendarReminder')
 			->willReturn($template1);
@@ -341,9 +341,14 @@ class EmailProviderTest extends AbstractNotificationProviderTest {
 			->willReturn($message23);
 		$this->mailer->expects($this->at(13))
 			->method('send')
-			->with($message23)
-			->willReturn([]);
-
+			->withConsecutive(
+				[$message11],
+				[$message12],
+				[$message13],
+				[$message21],
+				[$message22],
+				[$message23]
+			)->willReturn([]);
 		$this->setupURLGeneratorMock(2);
 
 		$vcalendar = $this->getAttendeeVCalendar();
