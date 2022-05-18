@@ -211,6 +211,15 @@ class RepairMimeTypes implements IRepairStep {
 		return $this->updateMimetypes($updatedMimetypes);
 	}
 
+	private function introduceOpenxmlType() {
+		$updatedMimetypes = [
+			"oform" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document.oform",
+			"docxf" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document.docxf",
+		];
+
+		return $this->updateMimetypes($updatedMimetypes);
+	}
+
 
 	/**
 	 * Fix mime types
@@ -259,6 +268,10 @@ class RepairMimeTypes implements IRepairStep {
 
 		if (version_compare($ocVersionFromBeforeUpdate, '23.0.0.2', '<') && $this->introduceFlatOpenDocumentType()) {
 			$out->info('Fixed Flat OpenDocument mime types');
+		}
+
+		if (version_compare($ocVersionFromBeforeUpdate, '23.0.0.2', '<') && $this->introduceOpenxmlType()) {
+			$out->info('Fixed Flat OpenXML mime types');
 		}
 	}
 }
