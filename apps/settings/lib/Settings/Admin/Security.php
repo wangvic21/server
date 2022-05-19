@@ -78,16 +78,32 @@ class Security implements ISettings {
 			$this->urlGenerator->linkToDocs('admin-2fa')
 		);
 
-		$parameters = [
-			// Encryption API
-			'encryptionEnabled' => $this->manager->isEnabled(),
-			'encryptionReady' => $this->manager->isReady(),
-			'externalBackendsEnabled' => count($this->userManager->getBackends()) > 1,
-			// Modules
-			'encryptionModules' => $encryptionModuleList,
-		];
+		$this->initialState->provideInitialState(
+			'encryption-enabled',
+			$this->manager->isEnabled()
+		);
 
-		return new TemplateResponse('settings', 'settings/admin/security', $parameters, '');
+		$this->initialState->provideInitialState(
+			'encryption-ready',
+			$this->manager->isReady()
+		);
+
+		$this->initialState->provideInitialState(
+			'external-backends-enabled',
+			count($this->userManager->getBackends()) > 1
+		);
+
+		$this->initialState->provideInitialState(
+			'encryption-modules',
+			$encryptionModuleList
+		);
+
+		$this->initialState->provideInitialState(
+			'encryption-admin-doc',
+			$this->urlGenerator->linkToDocs('admin-encryption')
+		);
+
+		return new TemplateResponse('settings', 'settings/admin/security', [], '');
 	}
 
 	/**
