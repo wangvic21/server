@@ -84,7 +84,7 @@ class LazyUser implements IUser {
 		return $this->getUser()->getBackendClassName();
 	}
 
-	public function getBackend(): ?UserInterface {
+	public function getBackend() {
 		return $this->getUser()->getBackend();
 	}
 

@@ -376,7 +376,7 @@ class User implements IUser {
 		return get_class($this->backend);
 	}
 
-	public function getBackend(): ?UserInterface {
+	public function getBackend() {
 		return $this->backend;
 	}
 
